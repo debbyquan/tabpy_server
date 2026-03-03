@@ -1,6 +1,10 @@
 #!/bin/sh
 set -eu
 
+# Railway should set PORT, but default just in case
+: "${PORT:=8080}"
+export PORT
+
 echo "PORT=$PORT"
 echo "Starting TabPy on 127.0.0.1:9004 ..."
 tabpy --host 127.0.0.1 --port 9004 --logging-level INFO &
