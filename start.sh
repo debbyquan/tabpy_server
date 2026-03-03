@@ -1,16 +1,7 @@
-#!/bin/sh
-set -eu
+import os
+from tabpy.tabpy_server.app.app import app  # Flask app used by TabPy
 
-# Railway should set PORT, but default just in case
-: "${PORT:=8080}"
-export PORT
-
-echo "PORT=$PORT"
-echo "Starting TabPy on 127.0.0.1:9004 ..."
-tabpy --host 127.0.0.1 --port 9004 --logging-level INFO &
-
-TABPY_PID=$!
-echo "TabPy pid=$TABPY_PID"
-
-echo "Starting Caddy on :$PORT ..."
-exec caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", "9004"))
+    # Railway needs 0.0.0.0 so it is reachable from the internet
+    app.run(host="0.0.0.0", port=port)
