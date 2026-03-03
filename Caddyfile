@@ -1,0 +1,14 @@
+{
+  auto_https off
+}
+
+:{$PORT} {
+  log {
+    output stdout
+  }
+
+  @health path /health
+  respond @health 200 "ok\n"
+
+  reverse_proxy 127.0.0.1:9004
+}
