@@ -1,51 +1,31 @@
 import os
-import sys
+from tabpy.tabpy_server.app.app import main as tabpy_main
 
-print("🚀 Starting TabPy with direct import...")
+def run():
+    port = int(os.environ.get("PORT", "9004"))
 
-# Get Railway port
-port = int(os.environ.get('PORT', 9004))
-print(f"📡 Port: {port}")
+    # Paths where Railway will have your TLS cert/key (you must provide these)
+    cert_file = os.environ.get("TABPY_CERT_FILE", "/app/certs/fullchain.pem")
+    key_file  = os.environ.get("TABPY_KEY_FILE",  "/app/certs/privkey.pem")
 
-try:
-    # Import TabPy directly and start it
-    from tabpy.tabpy_server.app.app import TabPyApp
-    
-    print("💻 Creating TabPy app...")
-    
-    # Try without config file first (older versions)
-    try:
-        app = TabPyApp()
-    except TypeError:
-        # If config file required, create minimal one
-        print("📋 Creating config file...")
-        
-        import tempfile
-        config_content = f'''[TabPy]
+    config_text = f"""
+[TabPy]
 TABPY_PORT = {port}
-TABPY_QUERY_OBJECT_PATH = /tmp/query_objects
-TABPY_STATE_PATH = /tmp/tabpy
+TABPY_TRANSFER_PROTOCOL = https
+TABPY_CERTIFICATE_FILE = {cert_file}
+TABPY_KEY_FILE = {key_file}
 
-[logging]
-TABPY_LOG_LEVEL = INFO
-'''
-        
-        config_file = '/tmp/tabpy_config.conf'
-        with open(config_file, 'w') as f:
-            f.write(config_content)
-        
-        app = TabPyApp(config_file=config_file)
-    
-    print(f"🌐 Starting server on 0.0.0.0:{port}")
-    
-    # Start the server
-    app.run(host='0.0.0.0', port=port, debug=False)
-    
-except ImportError as e:
-    print(f"❌ Import error: {e}")
-    print("💡 TabPy not installed properly")
-    sys.exit(1)
-    
-except Exception as e:
-    print(f"❌ Startup error: {e}")
-    sys.exit(1)
+# Optional but common in hosted environments:
+TABPY_STATE_PATH = /tmp/tabpy_state
+TABPY_QUERY_OBJECT_PATH = /tmp/query_objects
+"""
+
+    cfg_path = "/tmp/tabpy.conf"
+    with open(cfg_path, "w", encoding="utf-8") as f:
+        f.write(config_text)
+
+    # Start TabPy (blocks)
+    tabpy_main(["--config", cfg_path])
+
+if __name__ == "__main__":
+    run()
