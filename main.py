@@ -18,6 +18,10 @@ if __name__ == "__main__":
     with open("tabpy.conf", "w", encoding="utf-8") as f:
         f.write(conf_text)
 
+    print("PORT env:", port)
+    print("=== tabpy.conf ===")
+    print(conf_text)
+
     subprocess.check_call([
         "/app/.venv/bin/tabpy",
         "--config", "tabpy.conf",
