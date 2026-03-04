@@ -1,22 +1,25 @@
 import os
 import subprocess
-import textwrap
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", "8080"))
+    port = os.environ.get("PORT", "8080")
 
-    conf_text = textwrap.dedent(f"""
-    [TabPy]
-    StateFilePath = tabpy_state.pkl
-    LogFilePath = tabpy.log
-
-    [Server]
-    Host = 0.0.0.0
-    Port = {port}
-    """كتور).strip() + "\n"
+    conf_text = (
+        "[TabPy]\n"
+        "StateFilePath = tabpy_state.pkl\n"
+        "LogFilePath = tabpy.log\n"
+        "\n"
+        "[Server]\n"
+        "Host = 0.0.0.0\n"
+        f"Port = {port}\n"
+    )
 
     with open("tabpy.conf", "w", encoding="utf-8") as f:
         f.write(conf_text)
 
     # Start TabPy using its supported CLI
-    subprocess.check_call(["/app/.venv/bin/tabpy", "--config", "tabpy.conf", "--disable-auth-warning"])
+    subprocess.check_call([
+        "/app/.venv/bin/tabpy",
+        "--config", "tabpy.conf",
+        "--disable-auth-warning",
+    ])
